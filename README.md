@@ -1,4 +1,4 @@
-# Ghost Hunter Gadget
+# Ghost-It!
 
 A handheld Bop-It-style game for ECE 1895 (Design Project #2). The device plays a sound cue, and the player must perform the matching action (SCAN, TRAP IT, or PURGE IT) before time runs out. Built on an ESP32, programmed with the Arduino IDE.
 
