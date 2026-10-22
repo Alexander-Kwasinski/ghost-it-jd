@@ -16,8 +16,8 @@ enum GameState {
 };
 
 // Tunable numbers
-constexpr unsigned long START_WINDOW_MS = 3000;
-constexpr unsigned long WINDOW_STEP_MS  = 150;
-constexpr unsigned long MIN_WINDOW_MS   = 800;
+constexpr unsigned long START_RESPONSE_MS = 3000;
+constexpr unsigned long RESPONSE_STEP_MS  = 150;
+constexpr unsigned long MIN_RESPONSE_MS   = 800;
 constexpr unsigned long DEBOUNCE_MS     = 50;
 constexpr float SCAN_THRESHOLD_DPS      = 200.0;  // gyro rate that counts as a sweep

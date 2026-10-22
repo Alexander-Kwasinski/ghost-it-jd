@@ -28,6 +28,6 @@ constexpr int START_BUTTON = 14;  // big green pushbutton
 constexpr int LED_GREEN = 13;     // correct response (left antenna)
 constexpr int LED_RED   = 4;      // wrong action / timeout (right antenna)
  
-// ---------- Button lamps (optional, drive t`hrough a transistor) ----------
-constexpr int PURGE_LAMP = 26;
-constexpr int START_LAMP = 27;
+// ---------- Button LED ----------
+constexpr int PURGE_LED = 26;
+constexpr int START_LED = 27;
