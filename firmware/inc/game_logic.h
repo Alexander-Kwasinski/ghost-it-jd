@@ -8,3 +8,5 @@ int game_score();
 int response_time();
 
 Command game_pick_command();
+
+float game_pick_ghost_angle_deg();

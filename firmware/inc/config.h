@@ -10,9 +10,9 @@ enum Command {
 
 // The three game states
 enum GameState {
-  STATE_IDLE,
-  STATE_PLAYING,
-  STATE_GAME_OVER
+  IDLE,
+  PLAYING,
+  GAME_OVER
 };
 
 // Tunable numbers
