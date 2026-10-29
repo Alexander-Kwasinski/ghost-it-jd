@@ -1,0 +1,105 @@
+Added Component: Designator=J1(SAMESKY_SSK02-FPH-254-A6)
+Add component (AddParameter): Name = "Check_prices"; Value = "https://www.snapeda.com/parts/SSK02-FPH-254-A6/Same+Sky/view-part/?ref=eda"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MF"; Value = "Same Sky (Formerly CUI Devices)"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MP"; Value = "SSK02-FPH-254-A6"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Package"; Value = "None"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SnapEDA_Link"; Value = "https://www.snapeda.com/parts/SSK02-FPH-254-A6/Same+Sky/view-part/?ref=snap"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = ""; VariantName = "[No Variations]"
+Added Component: Designator=J2(SAMESKY_SSK01-MPH-254-A6)
+Add component (AddParameter): Name = "Check_prices"; Value = "https://www.snapeda.com/parts/SSK01-MPH-254-A6/Same+Sky/view-part/?ref=eda"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MF"; Value = "Same Sky (Formerly CUI Devices)"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MP"; Value = "SSK01-MPH-254-A6"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Package"; Value = "None"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SnapEDA_Link"; Value = "https://www.snapeda.com/parts/SSK01-MPH-254-A6/Same+Sky/view-part/?ref=snap"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = ""; VariantName = "[No Variations]"
+Added Component: Designator=J3(SAMESKY_SSK01-MPH-254-A6)
+Add component (AddParameter): Name = "Check_prices"; Value = "https://www.snapeda.com/parts/SSK01-MPH-254-A6/Same+Sky/view-part/?ref=eda"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MF"; Value = "Same Sky (Formerly CUI Devices)"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MP"; Value = "SSK01-MPH-254-A6"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Package"; Value = "None"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SnapEDA_Link"; Value = "https://www.snapeda.com/parts/SSK01-MPH-254-A6/Same+Sky/view-part/?ref=snap"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = ""; VariantName = "[No Variations]"
+Added Component: Designator=J4(SAMESKY_SSK02-FPH-254-A7)
+Add component (AddParameter): Name = "Availability"; Value = "Unavailable"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MF"; Value = "{'manufacturer': u'Same Sky (Formerly CUI Devices)'}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MP"; Value = "SSK02-FPH-254-A7"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Package"; Value = "None"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Price"; Value = "None"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = ""; VariantName = "[No Variations]"
+Added Component: Designator=J5(SAMESKY_SSK02-FPH-254-A4)
+Add component (AddParameter): Name = "Check_prices"; Value = "https://www.snapeda.com/parts/SSK02-FPH-254-A4/Same+Sky/view-part/?ref=eda"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MF"; Value = "Same Sky (Formerly CUI Devices)"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MP"; Value = "SSK02-FPH-254-A4"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Package"; Value = "None"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SnapEDA_Link"; Value = "https://www.snapeda.com/parts/SSK02-FPH-254-A4/Same+Sky/view-part/?ref=snap"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = ""; VariantName = "[No Variations]"
+Added Component: Designator=U1(MODULE_DEVKIT_V1_ESP32-WROOM-32)
+Add component (AddParameter): Name = "Check_prices"; Value = "https://www.snapeda.com/parts/DEVKIT%20V1%20ESP32-WROOM-32/Espressif+Systems/view-part/?ref=eda"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MF"; Value = "Espressif Systems"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MP"; Value = "DEVKIT V1 ESP32-WROOM-32"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Package"; Value = "Package"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SnapEDA_Link"; Value = "https://www.snapeda.com/parts/DEVKIT%20V1%20ESP32-WROOM-32/Espressif+Systems/view-part/?ref=snap"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = ""; VariantName = "[No Variations]"
+Added Pin To Net: NetName=+5 Pin=J1-5
+Added Pin To Net: NetName=+5 Pin=J2-6
+Added Pin To Net: NetName=+5 Pin=J4-2
+Added Pin To Net: NetName=+5 Pin=U1-19
+Added Net: Name=+5
+Added Pin To Net: NetName=AUDIO_DAC Pin=J3-3
+Added Pin To Net: NetName=AUDIO_DAC Pin=U1-9
+Added Net: Name=AUDIO_DAC
+Added Pin To Net: NetName=GND Pin=J1-6
+Added Pin To Net: NetName=GND Pin=J2-5
+Added Pin To Net: NetName=GND Pin=J3-2
+Added Pin To Net: NetName=GND Pin=J3-4
+Added Pin To Net: NetName=GND Pin=J3-5
+Added Pin To Net: NetName=GND Pin=J4-1
+Added Pin To Net: NetName=GND Pin=U1-38
+Added Net: Name=GND
+Added Pin To Net: NetName=LED_GREEN Pin=J5-1
+Added Pin To Net: NetName=LED_GREEN Pin=U1-12
+Added Net: Name=LED_GREEN
+Added Pin To Net: NetName=LED_PURGE Pin=J5-4
+Added Net: Name=LED_PURGE
+Added Pin To Net: NetName=LED_PURGE_BUTTON Pin=U1-8
+Added Net: Name=LED_PURGE_BUTTON
+Added Pin To Net: NetName=LED_RED Pin=J5-2
+Added Pin To Net: NetName=LED_RED Pin=U1-28
+Added Net: Name=LED_RED
+Added Pin To Net: NetName=LED_START Pin=J5-3
+Added Net: Name=LED_START
+Added Pin To Net: NetName=LED_START_BUTTON Pin=U1-7
+Added Net: Name=LED_START_BUTTON
+Added Pin To Net: NetName=OLED_CS Pin=J4-7
+Added Pin To Net: NetName=OLED_CS Pin=U1-11
+Added Net: Name=OLED_CS
+Added Pin To Net: NetName=OLED_DC Pin=J4-6
+Added Pin To Net: NetName=OLED_DC Pin=U1-10
+Added Net: Name=OLED_DC
+Added Pin To Net: NetName=OLED_RST Pin=J4-5
+Added Pin To Net: NetName=OLED_RST Pin=U1-26
+Added Net: Name=OLED_RST
+Added Pin To Net: NetName=SD_CS Pin=J1-1
+Added Pin To Net: NetName=SD_CS Pin=U1-15
+Added Net: Name=SD_CS
+Added Pin To Net: NetName=SPEAKER_NEG Pin=J2-1
+Added Pin To Net: NetName=SPEAKER_NEG Pin=J2-3
+Added Net: Name=SPEAKER_NEG
+Added Pin To Net: NetName=SPEAKER_POS Pin=J2-2
+Added Pin To Net: NetName=SPEAKER_POS Pin=J2-4
+Added Net: Name=SPEAKER_POS
+Added Pin To Net: NetName=SPI_MISO Pin=J1-4
+Added Pin To Net: NetName=SPI_MISO Pin=U1-31
+Added Net: Name=SPI_MISO
+Added Pin To Net: NetName=SPI_MOSI Pin=J1-3
+Added Pin To Net: NetName=SPI_MOSI Pin=U1-37
+Added Net: Name=SPI_MOSI
+Added Pin To Net: NetName=SPI_SCK Pin=J1-2
+Added Pin To Net: NetName=SPI_SCK Pin=J4-3
+Added Pin To Net: NetName=SPI_SCK Pin=U1-30
+Added Net: Name=SPI_SCK
+Added Class: Name=Audio
+Added Class: Name=DevKitESP32
+Added Class: Name=Display
+Added Rule: Name=Schematic Supply Nets
+Added Rule: Name=Schematic Supply Nets_1
