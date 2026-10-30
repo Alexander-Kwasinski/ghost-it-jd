@@ -1,0 +1,6 @@
+Record=TopLevelDocument|FileName=AudioAmplifier.SchDoc|SheetNumber=6
+Record=NoMainPathDocument|SourceDocument=AudioAmplifier.SchDoc|FileName=DevKitESP32.SchDoc|SheetNumber=1
+Record=NoMainPathDocument|SourceDocument=AudioAmplifier.SchDoc|FileName=Display.SchDoc|SheetNumber=2
+Record=NoMainPathDocument|SourceDocument=AudioAmplifier.SchDoc|FileName=Inputs.SchDoc|SheetNumber=3
+Record=NoMainPathDocument|SourceDocument=AudioAmplifier.SchDoc|FileName=MicroSDAdapter.SchDoc|SheetNumber=5
+Record=NoMainPathDocument|SourceDocument=AudioAmplifier.SchDoc|FileName=Regulators.SchDoc|SheetNumber=4
