@@ -18,6 +18,7 @@ constexpr uint8_t OLED_RST = 4; // active LOW.
 
 // ---------- microSD (audio files) ----------
 constexpr uint8_t SD_CS = 13;
+constexpr uint8_t SD_CD = 5;
 
 // ---------- I2C bus (motion sensor) ----------
 constexpr uint8_t I2C_SDA = 21;

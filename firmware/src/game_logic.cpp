@@ -29,7 +29,7 @@ int response_time() {
 }
 
 Command game_pick_command() {
-    return static_cast<Command>(random(0,3))
+    return static_cast<Command>(random(0,3));
 }
 
 float game_pick_ghost_angle_deg() {
