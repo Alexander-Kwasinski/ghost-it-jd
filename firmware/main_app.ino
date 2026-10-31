@@ -61,7 +61,7 @@ void endGame() {
     
 }
 
-setup() {
+void setup() {
     Serial.begin(115200);
 
     randomSeed(micros());
@@ -72,14 +72,18 @@ setup() {
 }
 
 
-loop() {
+void loop() {
+    start_button_update();
+    purge_switch_update();
+    trap_switch_update();
+
     motion_update();
-    inputs_update();
 
     switch (state) {
 
         case GameState::IDLE:
-
+            // screen start screen
+            // start button led turns
 
         case GameState::PLAYING:
 
