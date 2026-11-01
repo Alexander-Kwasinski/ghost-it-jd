@@ -84,7 +84,22 @@ void motion_update() {
     playerRotationDeg = normalizeAngle(playerRotationDeg);
 }
 
-bool motion_scan_target_found(float ghostAngleDeg) {
+float motion_scan_direction(float ghostAngleDeg)
+{
+    float difference = ghostAngleDeg - playerRotationDeg;
+
+    while (difference > 180.0f) {
+        difference -= 360.0f;
+    }
+
+    while (difference < -180.0f) {
+        difference += 360.0f;
+    }
+
+    return difference;
+}
+
+bool motion_target_found(float ghostAngleDeg) {
     if(!sensorRead || !scanActive) {
         return;
     }

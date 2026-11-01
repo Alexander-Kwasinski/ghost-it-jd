@@ -86,7 +86,18 @@ void loop() {
             // start button led turns
 
         case GameState::PLAYING:
+            if (activeCommand == SCAN) {
+                float activeGhostAngle = game_pick_ghost_angle_deg();
 
+                motion_begin_scan();
+
+                while (!motion_target_found(activeGhostAngle)) {
+                    motion_update();
+                    float direction = motion_scan_direction(activeGhostAngle);
+                }
+                motion_end_scan();
+                correctAnswer();
+            }
 
         case GameState::GAME_OVER:
             if(start_button_press()) {
