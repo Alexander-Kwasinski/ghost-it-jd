@@ -9,6 +9,7 @@ bool game_complete_command();
 
 int game_score();
 int response_time();
+int game_speed_level();
 
 Command game_pick_command();
 

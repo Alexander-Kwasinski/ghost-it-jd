@@ -172,7 +172,7 @@ void setup() {
     motion_init();
 
     if (audio_player_has_error()) {
-        display_show_error("AUDIO ERROR", "CHECK SD CARD");
+        display_show_error("AUDIO ERROR", audio_player_error_message());
 
         while (true) {
             delay(100);
@@ -198,7 +198,7 @@ void loop() {
 
     if (audio_player_has_error()) {
         motion_end_scan();
-        display_show_error("AUDIO ERROR", "CHECK SD/AUDIO");
+        display_show_error("AUDIO ERROR", audio_player_error_message());
 
         while (true) {
             delay(100);
@@ -238,6 +238,7 @@ void loop() {
             // Wait for the command audio to finish before starting the timer
             if (phase == PlayPhase::WAITING_FOR_COMMAND_AUDIO) {
                 if (audio_command_finished()) {
+                    inputs_clear_events();
 
                     commandStartedMs = millis();
                     phase = PlayPhase::WAITING_FOR_ACTION;

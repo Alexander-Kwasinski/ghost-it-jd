@@ -76,6 +76,7 @@ static AudioTrack currentTrack = TRACK_NONE;
 static bool sdReady = false;
 
 static bool themeEnabled = false;
+static bool commandFinished = false;
 
 static uint32_t themeResumePosition = 0;
 
@@ -89,7 +90,7 @@ static void setAudioError(const char *message) {
     audioErrorText = message;
 
     themeEnabled = false;
-    resumeThemeAfterCommand = false;
+    commandFinished = false;
 }
 
 bool audio_player_has_error() {
@@ -99,6 +100,15 @@ bool audio_player_has_error() {
 
 const char *audio_player_error_message() {
     return audioErrorText;
+}
+
+bool audio_command_finished() {
+    if (commandFinished) {
+        commandFinished = false;
+        return true;
+    }
+
+    return false;
 }
 
 static void stopCurrentTrack() {
@@ -223,7 +233,7 @@ bool audio_player_init()
     audioErrorText = "AUDIO ERROR";
 
     themeEnabled = false;
-    resumeThemeAfterCommand = false;
+    commandFinished = false;
     sdReady = false;
 
     // Configure card detection
@@ -311,7 +321,7 @@ void audio_start_theme() {
 
 void audio_stop_all() {
     themeEnabled = false;
-    resumeThemeAfterCommand = false;
+    commandFinished = false;
     themeResumePosition = 0;
 
     stopCurrentTrack();
@@ -332,21 +342,28 @@ void audio_set_speed_level(int level) {
 void audio_play_command(Command command) {
     const char *filename = nullptr;
 
+    commandFinished = false;
+
     switch (command) {
-        case CMD_SCAN:
+        case SCAN:
             filename = "/ScanIt.mp3";
             break;
 
-        case CMD_TRAP:
+        case TRAP:
             filename = "/TrapIt.mp3";
             break;
 
-        case CMD_PURGE:
+        case PURGE:
             filename = "/PurgeIt.mp3";
             break;
     }
 
-    if (filename == nullptr || !sdReady || audioError) {
+    if (filename == nullptr) {
+        setAudioError("INVALID COMMAND");
+        return;
+    }
+
+    if (!sdReady || audioError) {
         return;
     }
 
@@ -361,10 +378,8 @@ void audio_play_command(Command command) {
 
 
     if (!startTrack(filename, TRACK_COMMAND, 0, commandSpeed)) {
-        resumeThemeAfterCommand = false;
-
-        if (shouldResumeTheme && !audioError) {
-            resumeTheme();
+        if (!audioError) {
+            setAudioError("COMMAND AUDIO FAILED");
         }
     }
 }
@@ -372,7 +387,7 @@ void audio_play_command(Command command) {
 static void playResult(const char *filename)
 {
     themeEnabled = false;
-    resumeThemeAfterCommand = false;
+    commandFinished = false;
 
     stopCurrentTrack();
 
@@ -414,6 +429,8 @@ void audio_player_update() {
     }
 
     else if (finishedTrack == TRACK_COMMAND) {
+        commandFinished = true;
+
         if (themeEnabled) {
             resumeTheme();
         }

@@ -5,6 +5,8 @@
 #include <math.h>
 
 #include "motion.h"
+#include "pins.h"
+#include "config.h"
 
 Adafruit_MPU6050 mpu;
 
@@ -13,17 +15,18 @@ static float playerRotationDeg = 0;
 static unsigned long lastUpdateUs;
 static bool sensorReady = false;
 static bool scanActive = false;
+static float gyroBiasZ = 0.0f;
 
 static float normalizeAngle(float angle) {
     while (angle < 0) {
         angle += 360;
     } 
-    
-    while (angle > 360) {
+
+    while (angle >= 360) {
         angle -= 360;
     }
 
-    return angle
+    return angle;
 }
 
 // Find shortest distance between two angles.
@@ -40,8 +43,27 @@ static float angleDifference(float angle1, float angle2)
     return difference;
 }
 
+static void calibrateGyroscope() {
+    const int calibrationSamples = 200;
+    float gyroTotal = 0.0f;
+
+    for (int i = 0; i < calibrationSamples; i++) {
+        sensors_event_t accel, gyro, temp;
+        mpu.getEvent(&accel, &gyro, &temp);
+
+        gyroTotal += gyro.gyro.z;
+
+        delay(5);
+    }
+
+    gyroBiasZ = gyroTotal / calibrationSamples;
+}
+
 void motion_init() {
-    Wire.begin();
+    sensorReady = false;
+    scanActive = false;
+
+    Wire.begin(I2C_SDA, I2C_SCL);
 
     if(!mpu.begin()) {
         // needs updated to display some error code on the screen (probably)
@@ -49,14 +71,18 @@ void motion_init() {
         return;
     }
 
-    mpu.getGyroRange(MPU6050_RANGE_500_DEG);
+    mpu.setGyroRange(MPU6050_RANGE_500_DEG);
     mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+
+    delay(100);
+
+    calibrateGyroscope();
 
     sensorReady = true;
 }
 
 void motion_begin_scan() {
-    if(!sensorRead) {
+    if(!sensorReady) {
         return;
     }
 
@@ -67,12 +93,12 @@ void motion_begin_scan() {
     scanActive = true;
 }
 
-bool motion_is_read() {
+bool motion_is_ready() {
     return sensorReady;
 }
 
 void motion_update() {
-    if(!sensorRead || !scanActive) {
+    if(!sensorReady || !scanActive) {
         return;
     }
 
@@ -84,8 +110,12 @@ void motion_update() {
     float deltaT = (uint32_t)(now - lastUpdateUs) / 1000000.0f;
     lastUpdateUs = now;
 
-    playerRotationDeg += gyro.gyro.z * (180/PI) * deltaT;
-    playerRotationDeg = normalizeAngle(playerRotationDeg);
+    float rotationRateDps = (gyro.gyro.z - gyroBiasZ) * (180.0f / PI);
+
+    if (fabs(rotationRateDps) <= SCAN_THRESHOLD_DPS) {
+        playerRotationDeg += rotationRateDps * deltaT;
+        playerRotationDeg = normalizeAngle(playerRotationDeg);
+    }
 }
 
 float motion_scan_direction(float ghostAngleDeg)
@@ -104,8 +134,8 @@ float motion_scan_direction(float ghostAngleDeg)
 }
 
 bool motion_target_found(float ghostAngleDeg) {
-    if(!sensorRead || !scanActive) {
-        return;
+    if(!sensorReady || !scanActive) {
+        return false;
     }
 
     float difference = angleDifference(playerRotationDeg, ghostAngleDeg);

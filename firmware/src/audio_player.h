@@ -12,6 +12,8 @@ void audio_start_theme();
 void audio_stop_all();
 
 void audio_play_command(Command command);
+bool audio_command_finished();
+
 void audio_play_win();
 void audio_play_lose();
 

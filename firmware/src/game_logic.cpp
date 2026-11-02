@@ -44,6 +44,16 @@ int response_time() {
     return responseWinMs;
 }
 
+int game_speed_level() {
+    int level = completedCommands / COMMANDS_PER_SPEEDUP;
+
+    if (level > 9) {
+        level = 9;
+    }
+
+    return level;
+}
+
 Command game_pick_command() {
     // Select SCAN, TRAP, or PURGE.
     return static_cast<Command>(
@@ -52,5 +62,11 @@ Command game_pick_command() {
 }
 
 float game_pick_ghost_angle_deg() {
-    return random(0, 36000) / 100.0f;
+    float angle;
+
+    do {
+        angle = random(0, 36000) / 100.0f;
+    } while (angle <= 20.0f || angle >= 340.0f);
+
+    return angle;
 }
