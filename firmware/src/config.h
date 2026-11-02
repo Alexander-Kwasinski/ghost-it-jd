@@ -14,9 +14,15 @@ enum GameState {
   GAME_OVER
 };
 
-// Tunable numbers
+// Response timer.
 constexpr unsigned long START_RESPONSE_MS = 3000;
-constexpr unsigned long RESPONSE_STEP_MS  = 150;
-constexpr unsigned long MIN_RESPONSE_MS   = 800;
-constexpr unsigned long DEBOUNCE_MS     = 50;
-constexpr float SCAN_THRESHOLD_DPS      = 200.0;  // gyro rate that counts as a sweep
+constexpr unsigned long MIN_RESPONSE_MS = 100;
+constexpr unsigned long RESPONSE_STEP_MS = 323;
+
+// Game progression.
+constexpr int COMMANDS_PER_SPEEDUP = 10;
+constexpr int MAX_COMMANDS = 100;
+
+// Input and motion.
+constexpr unsigned long DEBOUNCE_MS = 50;
+constexpr float SCAN_THRESHOLD_DPS = 200.0f;

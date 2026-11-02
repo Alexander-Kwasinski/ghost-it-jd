@@ -129,8 +129,6 @@ static void drawRadarNoise() {
 }
 
 void display_init() {
-    SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, OLED_CS);
-
     oled.begin();
     oled.setContrast(180);
 
@@ -287,7 +285,6 @@ void display_update_radar(int score, int lives, bool showGhost, float ghostDirec
 void display_show_game_over(int finalScore)
 {
     char scoreText[16];
-
     snprintf(scoreText, sizeof(scoreText), "%d", finalScore);
 
     oled.clearBuffer();
@@ -307,7 +304,6 @@ void display_show_game_over(int finalScore)
 void display_show_you_win(int finalScore)
 {
     char scoreText[16];
-
     snprintf(scoreText, sizeof(scoreText), "%d", finalScore);
 
     oled.clearBuffer();

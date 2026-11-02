@@ -1,8 +1,11 @@
 #pragma once
+
 #include "config.h"
 
 void game_reset();
-void step_game_time();
+
+void game_record_correct();
+bool game_complete_command();
 
 int game_score();
 int response_time();
