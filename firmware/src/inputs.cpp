@@ -25,7 +25,7 @@ static unsigned long trapLastChangeMs = 0;
 
 void inputs_init()
 {
-    pinMode(START_BUTTON, INPUT_PULLUP);
+    pinMode(START_BUTTON, INPUT_PULLDOWN);
     pinMode(PURGE_BUTTON, INPUT);
     pinMode(TRAP_SWITCH, INPUT);
 
@@ -61,8 +61,8 @@ void start_button_update()
 
         startState = startReading;
 
-        // INPUT_PULLUP: LOW means pressed.
-        if (startState == LOW) {
+        // INPUT_PULLDOWN: HIGH means pressed.
+        if (startState == HIGH) {
             startPressed = true;
         }
     }

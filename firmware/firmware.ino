@@ -1,13 +1,14 @@
+
 #include <Arduino.h>
 #include <SPI.h>
 
-#include "pins.h"
-#include "config.h"
-#include "game_logic.h"
-#include "inputs.h"
-#include "motion.h"
-#include "audio_player.h"
-#include "display.h"
+#include "src/pins.h"
+#include "src/config.h"
+#include "src/game_logic.h"
+#include "src/inputs.h"
+#include "src/motion.h"
+#include "src/audio_player.h"
+#include "src/display.h"
 
 enum class PlayPhase : uint8_t {
     WAITING_FOR_COMMAND_AUDIO,
@@ -36,6 +37,7 @@ static void loseLife();
 static void finishGame(bool won);
 static void startRound();
 
+
 // Select the next command
 static void nextCommand() {
     inputs_clear_events();
@@ -55,6 +57,7 @@ static void nextCommand() {
 
     phase = PlayPhase::WAITING_FOR_COMMAND_AUDIO;
 }
+
 
 static void correctAnswer() {
     if (activeCommand == SCAN) {
@@ -109,6 +112,7 @@ static void loseLife() {
     resultStartedMs = millis();
 }
 
+
 // End the game
 static void finishGame(bool won) {
     motion_end_scan();
@@ -124,6 +128,7 @@ static void finishGame(bool won) {
         audio_play_lose();
     }
 }
+
 
 // Start a new round
 static void startRound() {
@@ -149,13 +154,26 @@ static void startRound() {
 
 
 void setup() {
+    // Initialize Serial debugging
+    Serial.begin(115200);
+    delay(500);
+
+    Serial.println();
+    Serial.println("================================");
+    Serial.println("       GHOST GAME STARTUP       ");
+    Serial.println("================================");
+
     randomSeed(micros());
 
     pinMode(LED_GREEN, OUTPUT);
     pinMode(LED_RED, OUTPUT);
+    pinMode(LED_START_BUTTON, OUTPUT);
+    pinMode(LED_PURGE_BUTTON, OUTPUT);
 
     digitalWrite(LED_GREEN, LOW);
     digitalWrite(LED_RED, LOW);
+    digitalWrite(LED_START_BUTTON, HIGH);
+    digitalWrite(LED_PURGE_BUTTON, LOW);
 
     // Deselect both SPI devices before initializing the bus
     pinMode(OLED_CS, OUTPUT);
@@ -172,6 +190,8 @@ void setup() {
     motion_init();
 
     if (audio_player_has_error()) {
+        Serial.println("ERROR: AUDIO INITIALIZATION FAILED");
+
         display_show_error("AUDIO ERROR", audio_player_error_message());
 
         while (true) {
@@ -180,6 +200,8 @@ void setup() {
     }
 
     if (!motion_is_ready()) {
+        Serial.println("ERROR: MPU6050 INITIALIZATION FAILED");
+
         display_show_error("MPU6050 ERROR", "CHECK SENSOR");
 
         while (true) {
@@ -190,6 +212,10 @@ void setup() {
     state = IDLE;
 
     display_show_title();
+
+    Serial.println("Game initialized successfully.");
+    Serial.println("Input GPIO monitoring started.");
+    Serial.println();
 }
 
 
@@ -197,6 +223,8 @@ void loop() {
     audio_player_update();
 
     if (audio_player_has_error()) {
+        Serial.println("ERROR: AUDIO PLAYER ERROR");
+
         motion_end_scan();
         display_show_error("AUDIO ERROR", audio_player_error_message());
 
@@ -205,17 +233,55 @@ void loop() {
         }
     }
 
+    // Update all inputs
     start_button_update();
     purge_switch_update();
     trap_switch_update();
 
+
+    // ==========================================
+    // INPUT GPIO DEBUGGING
+    // ==========================================
+
+    static unsigned long lastInputPrint = 0;
+
+    if (millis() - lastInputPrint >= 250) {
+        lastInputPrint = millis();
+
+        Serial.print("INPUTS | ");
+
+        Serial.print("START GPIO ");
+        Serial.print(START_BUTTON);
+        Serial.print(": ");
+        Serial.print(digitalRead(START_BUTTON));
+
+        Serial.print(" | PURGE GPIO ");
+        Serial.print(PURGE_BUTTON);
+        Serial.print(": ");
+        Serial.print(digitalRead(PURGE_BUTTON));
+
+        Serial.print(" | TRAP GPIO ");
+        Serial.print(TRAP_SWITCH);
+        Serial.print(": ");
+        Serial.println(digitalRead(TRAP_SWITCH));
+    }
+
+
+    // Check for a debounced START button event
     bool startPressed = start_button_press();
+
+    if (startPressed) {
+        Serial.println(">>> START BUTTON EVENT DETECTED <<<");
+    }
+
 
     motion_update();
 
+
     if (state == PLAYING) {
 
-        bool showGhost = (activeCommand == SCAN) && (phase == PlayPhase::WAITING_FOR_ACTION);
+        bool showGhost = (activeCommand == SCAN) &&
+                         (phase == PlayPhase::WAITING_FOR_ACTION);
 
         float direction = 0.0f;
 
@@ -226,17 +292,26 @@ void loop() {
         display_update_radar(game_score(), livesRemaining, showGhost, direction);
     }
 
+
     switch (state) {
 
         case IDLE:
+
             if (startPressed) {
+                Serial.println("START EVENT ACCEPTED - STARTING GAME");
+
+                digitalWrite(LED_START_BUTTON, LOW);
                 startRound();
             }
+
             break;
 
+
         case PLAYING:
+
             // Wait for the command audio to finish before starting the timer
             if (phase == PlayPhase::WAITING_FOR_COMMAND_AUDIO) {
+
                 if (audio_command_finished()) {
                     inputs_clear_events();
 
@@ -252,6 +327,7 @@ void loop() {
                 break;
             }
 
+
             // Pause after each response
             if (phase == PlayPhase::RESULT_PAUSE) {
 
@@ -262,26 +338,35 @@ void loop() {
                 break;
             }
 
+
             // Response timeout
             if (millis() - commandStartedMs >= (unsigned long)response_time()) {
+                Serial.println("COMMAND TIMED OUT");
+
                 loseLife();
                 break;
             }
 
+
             if (activeCommand == SCAN) {
+
                 bool purgeChanged = purge_switch_toggle();
                 bool trapChanged = trap_switch_toggle();
 
-                bool purgePressed = purgeChanged && digitalRead(PURGE_BUTTON) == LOW;
+                bool purgePressed = purgeChanged && digitalRead(PURGE_BUTTON) == HIGH;
 
-                bool trapPressed = trapChanged && digitalRead(TRAP_SWITCH) == LOW;
+                bool trapPressed = trapChanged && digitalRead(TRAP_SWITCH) == HIGH;
 
                 if (purgePressed || trapPressed) {
+                    Serial.println("INCORRECT INPUT DURING SCAN");
+
                     loseLife();
                     break;
                 }
 
                 if (motion_target_found(activeGhostAngle)) {
+                    Serial.println("SCAN SUCCESS");
+
                     correctAnswer();
                 }
             }
@@ -289,12 +374,17 @@ void loop() {
 
             // TRAP IT or PURGE IT
             else {
+
+                if (activeCommand == TRAP) {
+                    digitalWrite(LED_PURGE_BUTTON, HIGH);
+                }
+
                 bool purgeChanged = purge_switch_toggle();
                 bool trapChanged = trap_switch_toggle();
 
-                bool purgePressed = purgeChanged && digitalRead(PURGE_BUTTON) == LOW;
+                bool purgePressed = purgeChanged && digitalRead(PURGE_BUTTON) == HIGH;
 
-                bool trapPressed = trapChanged && digitalRead(TRAP_SWITCH) == LOW;
+                bool trapPressed = trapChanged && digitalRead(TRAP_SWITCH) == HIGH;
 
                 if (!purgePressed && !trapPressed) {
                     break;
@@ -304,18 +394,25 @@ void loop() {
                                (activeCommand == TRAP && trapPressed && !purgePressed);
 
                 if (correct) {
+                    Serial.println("CORRECT INPUT");
+
                     correctAnswer();
                 }
                 else {
+                    Serial.println("INCORRECT INPUT");
+
                     loseLife();
                 }
             }
 
             break;
 
+
         case GAME_OVER:
 
             if (startPressed) {
+                Serial.println("RESTART EVENT DETECTED");
+
                 startRound();
             }
 

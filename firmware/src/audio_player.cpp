@@ -237,14 +237,14 @@ bool audio_player_init()
     sdReady = false;
 
     // Configure card detection
-    pinMode(SD_CD, INPUT_PULLUP);
-    delay(20);
+    // pinMode(SD_CD, INPUT_PULLUP);
+    // delay(20);
 
-    // Check whether a card is physically inserted
-    if (digitalRead(SD_CD) == HIGH) {
-        setAudioError("NO SD CARD INSERTED");
-        return false;
-    }
+    // // Check whether a card is physically inserted
+    // if (digitalRead(SD_CD) == HIGH) {
+    //     setAudioError("NO SD CARD INSERTED");
+    //     return false;
+    // }
 
     // Initialize the SD card using the shared SPI bus
     if (!SD.begin(SD_CS, SPI, 10000000)) {
