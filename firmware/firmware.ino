@@ -49,6 +49,10 @@ static void nextCommand() {
 
     activeCommand = game_pick_command();
 
+    Serial.printf("CURRENT COMMAND: %s\n",
+    activeCommand == SCAN ? "SCAN" :
+    activeCommand == TRAP ? "TRAP" : "PURGE");
+
     // Set audio speed based on the current difficulty.
     audio_set_speed_level(game_speed_level());
 
@@ -127,6 +131,8 @@ static void finishGame(bool won) {
         display_show_game_over(game_score());
         audio_play_lose();
     }
+
+    digitalWrite(LED_START_BUTTON, HIGH);
 }
 
 
