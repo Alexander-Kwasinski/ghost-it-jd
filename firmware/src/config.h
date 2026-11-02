@@ -2,10 +2,9 @@
 
 // The commands the game can issue, and what the player can do
 enum Command {
-  CMD_NONE,
-  CMD_SCAN,
-  CMD_TRAP,
-  CMD_PURGE
+  SCAN,
+  TRAP,
+  PURGE
 };
 
 // The three game states

@@ -9,7 +9,7 @@ void game_reset() {
     score = 0;
 }
 
-void step_response_time() {
+void step_game_time() {
     score++;
 
     if (responseWindowMs - MIN_RESPONSE_MS
@@ -33,5 +33,5 @@ Command game_pick_command() {
 }
 
 float game_pick_ghost_angle_deg() {
-    return random(0, 360);
+    return random(0, 36000) / 100.0f;
 }

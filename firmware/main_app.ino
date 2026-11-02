@@ -10,29 +10,42 @@
 #include "display.h"
 
 enum class PlayPhase : uint8_t {
-    START_SOUND,
-    COMMAND_SOUND,
     WAITING_FOR_ACTION,
-    CORRECT_SOUND
+    CORRECT_PAUSE
 };
 
 GameState state = GameState::IDLE;
-PlayPhase phase = PlayPhase::START_SOUND;
-Command activeCommand = static_cast<Command>(random(0,3));
+PlayPhase phase = PlayPhase::WAITING_FOR_INPUT;
+
+static Command activeCommand = SCAN;
+
+static int livesRemaining = 3;
+static float activeGhostAngle = 0.0f;
+
+static unsigned long commandStartedMs = 0;
+static unsigned long resultStartedMs = 0;
+
+static const unsigned long RESULT_PAUSE_MS = 450;
+
 
 void nextCommand()
 {
     inputs_clear_events();
 
+    digitalWrite(GREEN_LED_PIN, LOW);
+    digitalWrite(RED_LED_PIN, LOW);
+
+    motion_end_scan();
+
     activeCommand = game_pick_command();
 
-    display_set_green_led(false);
-    display_set_red_led(false);
-    display_show_score(game_score());
+    commandStartedMs = millis();
+    phase = PlayPhase::WAITING_FOR_ACTION;
 
-    audio_play_command(activeCommand);
-
-    phase = PlayPhase::COMMAND_SOUND;
+    if (activeCommand == SCAN) {
+        activeGhostAngle = game_pick_ghost_angle_deg();
+        motion_begin_scan();
+    }
 }
 
 void correctAnswer()
@@ -41,6 +54,10 @@ void correctAnswer()
 
     display_set_green_led(true);
     audio_play_correct();
+
+    if (activeCommand == SCAN) {
+        motion_end_scan();
+    }
 
     phase = PlayPhase::CORRECT_SOUND;
 }
@@ -58,7 +75,10 @@ void startRound() {
 }
 
 void endGame() {
-    
+    motion_end_scan();
+
+    state = GAME_OVER;
+    phase = PlayPhase::WAITING_FOR_INPUT;
 }
 
 void setup() {
@@ -79,13 +99,28 @@ void loop() {
 
     motion_update();
 
+    bool startPressed = start_button_press();
+
     switch (state) {
 
         case GameState::IDLE:
             // screen start screen
             // start button led turns
+            if (startPressed) {
+                startRound();
+            }
+            break;
 
         case GameState::PLAYING:
+
+            // Check whether the response window expired.
+            if (millis() - commandStartedMs >=
+                    (unsigned long)response_time()) {
+
+                endGame();
+                break;
+            }
+
             if (activeCommand == SCAN) {
                 float activeGhostAngle = game_pick_ghost_angle_deg();
 

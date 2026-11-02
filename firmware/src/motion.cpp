@@ -26,6 +26,20 @@ static float normalizeAngle(float angle) {
     return angle
 }
 
+// Find shortest distance between two angles.
+static float angleDifference(float angle1, float angle2)
+{
+    float difference = fabs(
+        normalizeAngle(angle1) - normalizeAngle(angle2)
+    );
+
+    if (difference > 180) {
+        difference = 360 - difference;
+    }
+
+    return difference;
+}
+
 void motion_init() {
     Wire.begin();
 
@@ -53,18 +67,8 @@ void motion_begin_scan() {
     scanActive = true;
 }
 
-// Find shortest distance between two angles.
-static float angleDifference(float angle1, float angle2)
-{
-    float difference = fabs(
-        normalizeAngle(angle1) - normalizeAngle(angle2)
-    );
-
-    if (difference > 180) {
-        difference = 360 - difference;
-    }
-
-    return difference;
+bool motion_is_read() {
+    return sensorReady;
 }
 
 void motion_update() {

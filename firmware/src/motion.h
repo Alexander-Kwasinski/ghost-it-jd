@@ -8,6 +8,8 @@ void motion_begin_scan();
 // read the sensor and update the estimated rotation
 void motion_update();
 
+bool motion_is_read();
+
 // used so that the display knows which way to skew the proximity meter
 float motion_scan_direction(float ghostAngleDeg);
 
