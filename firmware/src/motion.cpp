@@ -104,7 +104,7 @@ void motion_update() {
 
     sensors_event_t accel, gyro, temp;
     mpu.getEvent(&accel, &gyro, &temp);
-    
+
     float rotationRateDps = (gyro.gyro.z - gyroBiasZ) * (180.0f / PI);
 
     static unsigned long lastPrint = 0;
@@ -124,8 +124,6 @@ void motion_update() {
 
     float deltaT = (uint32_t)(now - lastUpdateUs) / 1000000.0f;
     lastUpdateUs = now;
-
-    float rotationRateDps = (gyro.gyro.z - gyroBiasZ) * (180.0f / PI);
 
     if (fabs(rotationRateDps) <= SCAN_THRESHOLD_DPS) {
         playerRotationDeg += rotationRateDps * deltaT;
