@@ -6,6 +6,7 @@
 
 #include "display.h"
 #include "pins.h"
+#include "spi_bus.h"
 
 U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI oled(
     U8G2_R0,
@@ -13,6 +14,12 @@ U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI oled(
     OLED_DC,
     OLED_RST
 );
+
+// The audio task reads the SD card on the same SPI bus.
+static void sendFrame() {
+    SpiBusLock lock;
+    oled.sendBuffer();
+}
 
 static const int RADAR_X = 64;
 static const int RADAR_Y = 39;
@@ -26,8 +33,6 @@ static float previousSweepAngle = 0.0f;
 
 static bool radarStarted = false;
 static bool pingActive = false;
-
-static uint32_t noiseSeed = 0xA53C9E21;
 
 
 static float normalizeDegrees(float angle) {
@@ -106,28 +111,6 @@ static void drawPingRing(int x, int y, int radius) {
 }
 
 
-// add random flickering pixels to imitate interference.
-static void drawRadarNoise() {
-    // this separate random sequence does not affect game randomness.
-    for (int i = 0; i < 10; i++) {
-
-        noiseSeed = noiseSeed * 1664525UL + 1013904223UL;
-        int xOffset = (int)((noiseSeed >> 16) % 47) - 23;
-
-        noiseSeed = noiseSeed * 1664525UL + 1013904223UL;
-        int yOffset = (int)((noiseSeed >> 16) % 47) - 23;
-
-        if (xOffset * xOffset + yOffset * yOffset <
-            RADAR_RADIUS * RADAR_RADIUS) {
-
-            oled.drawPixel(
-                RADAR_X + xOffset,
-                RADAR_Y + yOffset
-            );
-        }
-    }
-}
-
 void display_init() {
     oled.begin();
     oled.setContrast(180);
@@ -146,7 +129,7 @@ void display_show_title() {
     oled.setFont(u8g2_font_6x10_tf);
     drawCentered("PRESS START", 45);
 
-    oled.sendBuffer();
+    sendFrame();
 }
 
 void display_update_radar(int score, int lives, bool showGhost, float ghostDirectionDeg) {
@@ -214,7 +197,6 @@ void display_update_radar(int score, int lives, bool showGhost, float ghostDirec
 
     // Draw the radar background.
     drawRadarBase();
-    drawRadarNoise();
     drawSweepTrail(sweepAngle);
 
 
@@ -278,7 +260,7 @@ void display_update_radar(int score, int lives, bool showGhost, float ghostDirec
         oled.drawDisc(ghostX, ghostY, 2);
     }
 
-    oled.sendBuffer();
+    sendFrame();
 }
 
 
@@ -298,7 +280,7 @@ void display_show_game_over(int finalScore)
     oled.setFont(u8g2_font_10x20_tf);
     drawCentered(scoreText, 57);
 
-    oled.sendBuffer();
+    sendFrame();
 }
 
 void display_show_you_win(int finalScore)
@@ -317,7 +299,7 @@ void display_show_you_win(int finalScore)
     oled.setFont(u8g2_font_10x20_tf);
     drawCentered(scoreText, 57);
 
-    oled.sendBuffer();
+    sendFrame();
 }
 
 
@@ -331,5 +313,5 @@ void display_show_error(const char *title, const char *message)
     oled.setFont(u8g2_font_6x10_tf);
     drawCentered(message, 45);
 
-    oled.sendBuffer();
+    sendFrame();
 }
