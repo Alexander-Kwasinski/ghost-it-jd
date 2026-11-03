@@ -13,11 +13,12 @@ constexpr uint8_t SPI_MOSI = 23;
 // ---------- OLED (SSD1309, SPI) ----------
 constexpr uint8_t OLED_CS  = 27;
 constexpr uint8_t OLED_DC  = 26;
-constexpr uint8_t OLED_RST = 4; // active LOW.
+constexpr uint8_t OLED_RST = 4; // LOW when inserted
 
 
 // ---------- microSD (audio files) ----------
 constexpr uint8_t SD_CS = 13;
+constexpr uint8_t SD_CD = 5;
 
 // ---------- I2C bus (motion sensor) ----------
 constexpr uint8_t I2C_SDA = 21;
