@@ -372,8 +372,7 @@ void loop() {
 
             // TRAP IT or PURGE IT
             else {
-
-                if (activeCommand == TRAP) {
+                if (activeCommand == PURGE) {
                     digitalWrite(LED_PURGE_BUTTON, HIGH);
                 }
 

@@ -263,11 +263,10 @@ void display_update_radar(int score, int lives, bool showGhost, float ghostDirec
     sendFrame();
 }
 
-
 void display_show_game_over(int finalScore)
 {
-    char scoreText[16];
-    snprintf(scoreText, sizeof(scoreText), "%d", finalScore);
+    char scoreText[24];
+    snprintf(scoreText, sizeof(scoreText), "FINAL SCORE: %d", finalScore);
 
     oled.clearBuffer();
 
@@ -275,10 +274,8 @@ void display_show_game_over(int finalScore)
     drawCentered("GAME OVER", 20);
 
     oled.setFont(u8g2_font_6x10_tf);
-    drawCentered("FINAL SCORE", 36);
-
-    oled.setFont(u8g2_font_10x20_tf);
-    drawCentered(scoreText, 57);
+    drawCentered(scoreText, 36);
+    drawCentered("Press start to retry", 54);
 
     sendFrame();
 }
