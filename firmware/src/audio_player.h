@@ -3,7 +3,6 @@
 #include "config.h"
 
 bool audio_player_init();
-void audio_player_update();
 
 bool audio_player_has_error();
 const char *audio_player_error_message();
