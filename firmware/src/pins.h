@@ -15,7 +15,6 @@ constexpr uint8_t OLED_CS  = 27;
 constexpr uint8_t OLED_DC  = 26;
 constexpr uint8_t OLED_RST = 4; // LOW when inserted
 
-
 // ---------- microSD (audio files) ----------
 constexpr uint8_t SD_CS = 13;
 constexpr uint8_t SD_CD = 5;

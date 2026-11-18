@@ -15,9 +15,9 @@ enum GameState {
 };
 
 // Response timer.
-constexpr unsigned long START_RESPONSE_MS = 3000;
-constexpr unsigned long MIN_RESPONSE_MS = 100;
-constexpr unsigned long RESPONSE_STEP_MS = 323;
+constexpr unsigned long START_RESPONSE_MS = 10000;
+constexpr unsigned long MIN_RESPONSE_MS = 5500;
+constexpr unsigned long RESPONSE_STEP_MS = 500;
 
 // Game progression.
 constexpr int COMMANDS_PER_SPEEDUP = 10;

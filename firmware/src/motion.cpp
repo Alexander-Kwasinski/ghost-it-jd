@@ -105,23 +105,25 @@ void motion_update() {
     sensors_event_t accel, gyro, temp;
     mpu.getEvent(&accel, &gyro, &temp);
 
+    float rotationRateDps = (gyro.gyro.z - gyroBiasZ) * (180.0f / PI);
+
     static unsigned long lastPrint = 0;
 
     if (millis() - lastPrint >= 250) {
         lastPrint = millis();
 
-        Serial.printf("GYRO | X: %.2f | Y: %.2f | Z: %.2f deg/s\n",
+        Serial.printf("GYRO | X: %.2f | Y: %.2f | Z: %.2f deg/s | Z corrected: %.2f | heading: %.1f\n",
             gyro.gyro.x * 180.0f / PI,
             gyro.gyro.y * 180.0f / PI,
-            gyro.gyro.z * 180.0f / PI);
+            gyro.gyro.z * 180.0f / PI,
+            rotationRateDps,
+            playerRotationDeg);
     }
 
     unsigned long now = micros();
 
     float deltaT = (uint32_t)(now - lastUpdateUs) / 1000000.0f;
     lastUpdateUs = now;
-
-    float rotationRateDps = (gyro.gyro.z - gyroBiasZ) * (180.0f / PI);
 
     if (fabs(rotationRateDps) <= SCAN_THRESHOLD_DPS) {
         playerRotationDeg += rotationRateDps * deltaT;

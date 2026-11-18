@@ -4,12 +4,24 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
+
 #include "AudioFileSourceSD.h"
 #include "AudioGeneratorMP3.h"
 #include "AudioOutputInternalDAC.h"
 
 #include "pins.h"
+#include "spi_bus.h"
 #include "audio_player.h"
+
+// mp3->loop() does not return until the clip ends, so decoding runs on its
+// own task. The public functions below take audioMutex to change the track.
+static SemaphoreHandle_t audioMutex = nullptr;
+
+// Makes the decoder give control back so the mutex can be taken quickly.
+static volatile bool abortPlayback = false;
 
 // The ESP32 has one DAC output connected to GPIO25
 // Mix the left and right MP3 channels into mono
@@ -46,6 +58,10 @@ public:
 
     // Mix left and right audio samples
     bool ConsumeSample(int16_t samples[2]) override {
+        if (abortPlayback) {
+            return false;
+        }
+
         int32_t mixed =
             ((int32_t)samples[0] + (int32_t)samples[1]) / 2;
 
@@ -57,6 +73,46 @@ public:
         return AudioOutputInternalDAC::ConsumeSample(monoSamples);
     }
 };
+
+// The OLED shares the SPI bus with the SD card, so SD reads take the bus lock.
+class LockedSdSource : public AudioFileSourceSD {
+public:
+    bool open(const char *filename) override {
+        SpiBusLock lock;
+        return AudioFileSourceSD::open(filename);
+    }
+
+    uint32_t read(void *data, uint32_t length) override {
+        SpiBusLock lock;
+        return AudioFileSourceSD::read(data, length);
+    }
+
+    bool seek(int32_t position, int direction) override {
+        SpiBusLock lock;
+        return AudioFileSourceSD::seek(position, direction);
+    }
+
+    bool close() override {
+        SpiBusLock lock;
+        return AudioFileSourceSD::close();
+    }
+};
+
+
+// Takes over the audio state until the end of the scope.
+class AudioLock {
+public:
+    AudioLock() {
+        abortPlayback = true;
+        xSemaphoreTakeRecursive(audioMutex, portMAX_DELAY);
+        abortPlayback = false;
+    }
+
+    ~AudioLock() {
+        xSemaphoreGiveRecursive(audioMutex);
+    }
+};
+
 
 enum AudioTrack {
     TRACK_NONE,
@@ -71,18 +127,18 @@ static GameAudioOutput *audioOutput = nullptr;
 static AudioFileSourceSD *audioFile = nullptr;
 static AudioGeneratorMP3 *mp3 = nullptr;
 
-static AudioTrack currentTrack = TRACK_NONE;
+static volatile AudioTrack currentTrack = TRACK_NONE;
 
 static bool sdReady = false;
 
 static bool themeEnabled = false;
-static bool commandFinished = false;
+static volatile bool commandFinished = false;
 
 static uint32_t themeResumePosition = 0;
 
 static int currentSpeedLevel = 0;
 
-static bool audioError = false;
+static volatile bool audioError = false;
 static const char *audioErrorText = "AUDIO ERROR";
 
 static void setAudioError(const char *message) {
@@ -138,7 +194,7 @@ static bool startTrack(const char *filename, AudioTrack track, uint32_t resumePo
     }
 
     // Open the MP3 file
-    audioFile = new AudioFileSourceSD();
+    audioFile = new LockedSdSource();
 
     if (audioFile == nullptr) {
         setAudioError("AUDIO MEMORY FAILED");
@@ -227,8 +283,23 @@ static const char *missingAudioFile() {
 }
 
 
+static void audio_player_update();
+
+static void audioTask(void *unused) {
+    while (true) {
+        xSemaphoreTakeRecursive(audioMutex, portMAX_DELAY);
+        audio_player_update();
+        xSemaphoreGiveRecursive(audioMutex);
+
+        vTaskDelay(1);
+    }
+}
+
+
 bool audio_player_init()
 {
+    spi_bus_init();
+
     audioError = false;
     audioErrorText = "AUDIO ERROR";
 
@@ -270,6 +341,15 @@ bool audio_player_init()
         return false;
     }
 
+    audioMutex = xSemaphoreCreateRecursiveMutex();
+
+    if (audioMutex == nullptr) {
+        setAudioError("AUDIO MEMORY FAILED");
+        return false;
+    }
+
+    xTaskCreatePinnedToCore(audioTask, "audio", 12288, nullptr, 2, nullptr, 0);
+
     return true;
 }
 
@@ -305,6 +385,8 @@ static void resumeTheme() {
 }
 
 void audio_start_theme() {
+    AudioLock lock;
+
     audio_stop_all();
 
     if (!sdReady || audioError) {
@@ -320,6 +402,8 @@ void audio_start_theme() {
 }
 
 void audio_stop_all() {
+    AudioLock lock;
+
     themeEnabled = false;
     commandFinished = false;
     themeResumePosition = 0;
@@ -340,6 +424,8 @@ void audio_set_speed_level(int level) {
 }
 
 void audio_play_command(Command command) {
+    AudioLock lock;
+
     const char *filename = nullptr;
 
     commandFinished = false;
@@ -386,6 +472,8 @@ void audio_play_command(Command command) {
 
 static void playResult(const char *filename)
 {
+    AudioLock lock;
+
     themeEnabled = false;
     commandFinished = false;
 
@@ -404,7 +492,8 @@ void audio_play_lose() {
     playResult("/YouLose.mp3");
 }
 
-void audio_player_update() {
+// Runs on the audio task with audioMutex held.
+static void audio_player_update() {
     if (mp3 == nullptr) {
         return;
     }
